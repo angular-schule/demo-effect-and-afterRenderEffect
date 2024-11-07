@@ -1,0 +1,16 @@
+<button (click)="changeOrder()" class="btn btn-primary mb-4">Change order (locally)</button>
+
+@for (b of books(); track b.isbn) {
+
+  <app-book
+    (ratingChange)="handleRatingChange($event.isbn, $event.newRating)"
+    [book]="b"
+  />
+
+} @empty {
+  No books available
+}
+
+<p>
+  <strong>Amount of books:</strong> {{ books().length }}
+</p>
