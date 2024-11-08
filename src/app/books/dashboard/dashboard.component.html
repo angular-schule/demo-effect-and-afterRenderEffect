@@ -1,9 +1,6 @@
-<button (click)="changeOrder()" class="btn btn-primary mb-4">Change order (locally)</button>
-
-@for (b of books(); track b.isbn) {
+@for (b of booksResource.value(); track b.isbn) {
 
   <app-book
-    (ratingChange)="handleRatingChange($event.isbn, $event.newRating)"
     [book]="b"
   />
 
@@ -12,5 +9,5 @@
 }
 
 <p>
-  <strong>Amount of books:</strong> {{ books().length }}
+  <strong>Amount of books:</strong> {{ booksResource.value()?.length }}
 </p>
