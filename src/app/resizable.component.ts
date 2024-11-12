@@ -15,14 +15,14 @@ export class ResizableComponent {
 
     const effect = afterRenderEffect({
 
-      // The earlyRead phase reads the current offsetHeight
-      earlyRead: () => {
+      // earlyRead: Captures the current height of the textarea from the DOM.
+      earlyRead: (onCleanup) => {
 
         console.warn(`earlyRead executes`);
 
         // Make `extraHeight` a dependency of `earlyRead`
         // Now this code it will run again whenever `extraHeight` changes
-        // Hint: remove this statement, and `earlyRead` will execute only once! 🤯
+        // Hint: remove this statement, and `earlyRead` will execute only once!
         console.log('earlyRead: extra height:', this.extraHeight());
 
         const currentHeight: number = this.myElement()?.nativeElement.offsetHeight;
@@ -32,7 +32,7 @@ export class ResizableComponent {
         return currentHeight;
       },
 
-      // The write phase adjusts the height based on the offsetHeight + extraHeight
+      // write: Sets the new height by adding `extraHeight` to the captured DOM height.
       write: (currentHeight, onCleanup) => {
 
         console.warn(`write executes`);
@@ -40,10 +40,11 @@ export class ResizableComponent {
         // Make `extraHeight` a dependency of `earlyRead`
         const newHeight = currentHeight() + this.extraHeight();
         // Hint: use this code, so that we have no dependendy to a signal that is changed, and `write` will be executed only once
+        // Hint 2: if currentHeight changes in `earlyRead`, this code will run, too
         // const newHeight = currentHeight();
 
         this.myElement().nativeElement.style.height = `${newHeight}px`;
-        console.log('write: written height:', this.extraHeight());
+        console.log('write: written height:', newHeight);
 
 
         onCleanup(() => {
@@ -51,7 +52,7 @@ export class ResizableComponent {
         });
 
         // Pass the height to the next phase
-        // Hint: pass the same value to `read`, it will not be executed with the same value twice, eg. `return 100`
+        // Hint: pass the same value to `read`, in that case it will not be executed with the same value twice, eg. `return 100`
         return newHeight;
         // return 100;
       },
@@ -63,7 +64,7 @@ export class ResizableComponent {
       }
     });
 
-    // Trigger a new run every 2 seconds by setting the signal `extraHeight`
+    // Trigger a new run every 4 seconds by setting the signal `extraHeight`
     setInterval(() => {
       console.warn('---- new round ----');
       this.extraHeight.update(x => ++x)
@@ -73,7 +74,6 @@ export class ResizableComponent {
     // setInterval(() => this.extraHeight.update(x => x), 4_000);
 
     // cleanup callbacks are also executed when we destroy the hook
-    // we will see the text: 'cleanup is called'
     // setTimeout(() => effect.destroy(), 20_000);
   }
 }
