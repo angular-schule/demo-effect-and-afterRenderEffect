@@ -9,7 +9,7 @@ import { Component, viewChild, ElementRef, signal, afterRenderEffect } from "@an
 export class ResizableComponent {
 
   myElement = viewChild.required<ElementRef>('myElement');
-  extraHeight = signal<number>(0);
+  extraHeight = signal(0);
 
   constructor() {
 
@@ -28,7 +28,7 @@ export class ResizableComponent {
         const currentHeight: number = this.myElement()?.nativeElement.offsetHeight;
         console.log('earlyRead: offset height:', currentHeight);
 
-        // Pass the height to the next phase
+        // Pass the height to the next effect
         return currentHeight;
       },
 
@@ -37,29 +37,28 @@ export class ResizableComponent {
 
         console.warn(`write executes`);
 
-        // Make `extraHeight` a dependency of `earlyRead`
+        // Make `extraHeight` a dependency of `write`
+        // Hint: change this code to `const newHeight = currentHeight();`,
+        // so that we have no dependency to a signal that is changed, and `write` will be executed only once
+        // Hint 2: if `currentHeight` changes in `earlyRead`, `write` will re-run, too.
+        // resize the textarea manually to achieve this
         const newHeight = currentHeight() + this.extraHeight();
-        // Hint: use this code, so that we have no dependendy to a signal that is changed, and `write` will be executed only once
-        // Hint 2: if currentHeight changes in `earlyRead`, this code will run, too
-        // const newHeight = currentHeight();
 
         this.myElement().nativeElement.style.height = `${newHeight}px`;
         console.log('write: written height:', newHeight);
-
 
         onCleanup(() => {
           console.log('write: cleanup is called', newHeight);
         });
 
-        // Pass the height to the next phase
-        // Hint: pass the same value to `read`, in that case it will not be executed with the same value twice, eg. `return 100`
+        // Pass the height to the next effect
+        // Hint: pass the same value to `read`, e.g. `return 100`, to see how `read` is skipped
         return newHeight;
-        // return 100;
       },
 
-      // The read phase logs the updated height
+      // The read effect logs the updated height
       read: (newHeight, onCleanup) => {
-        console.warn(`read executes`);
+        console.warn('read executes');
         console.log('read: new height:', newHeight());
       }
     });
@@ -70,7 +69,7 @@ export class ResizableComponent {
       this.extraHeight.update(x => ++x)
     }, 4_000);
 
-    // Try this, if the signal value stays the same, nothing will hapen
+    // Try this, if the signal value stays the same, nothing will happen
     // setInterval(() => this.extraHeight.update(x => x), 4_000);
 
     // cleanup callbacks are also executed when we destroy the hook
