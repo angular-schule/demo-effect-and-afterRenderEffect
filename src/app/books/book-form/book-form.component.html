@@ -1,0 +1,29 @@
+@let c = bookForm.controls;
+
+<form [formGroup]="bookForm" (ngSubmit)="submitForm()">
+
+  <div class="form-group">
+    <label for="isbn">ISBN</label>
+    <input [formControl]="c.isbn" type="text" class="form-control" id="isbn">
+  </div>
+
+  <div class="form-group">
+    <label for="title">Title</label>
+    <input [formControl]="c.title" type="text" class="form-control" id="title">
+  </div>
+
+  <div class="form-group">
+    <label for="description">Description</label>
+    <textarea [formControl]="c.description" class="form-control" id="description"></textarea>
+  </div>
+
+  <div class="form-group">
+    <label for="rating">Rating</label>
+    <input [formControl]="c.rating" type="number" class="form-control" id="rating">
+  </div>
+
+  <button type="submit" aria-label="Submit Form" class="btn btn-primary mb-4" [disabled]="!bookForm.valid">
+    {{ isEditMode() ? 'Edit Book' : 'Create Book' }}
+  </button>
+
+</form>

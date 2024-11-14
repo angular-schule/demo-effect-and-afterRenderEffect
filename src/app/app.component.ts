@@ -10,7 +10,6 @@ import { ResizableComponent } from './resizable.component';
   imports: [DashboardComponent, ResizableComponent]
 })
 export class AppComponent {
-  title = 'Book Rating';
 
   counter = signal(0);
   showCounter = signal(true);

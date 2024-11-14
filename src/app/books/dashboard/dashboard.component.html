@@ -1,11 +1,25 @@
+
+<app-book-form
+  (create)="addBook($event)"
+  (edit)="changeBook($event)"
+  [currentBook]="currentBook()"
+/>
+
+
 @for (b of booksResource.value(); track b.isbn) {
 
   <app-book
     [book]="b"
+    (edit)="changeToEditMode($event)"
   />
 
 } @empty {
   No books available
+}
+
+
+@if (booksResource.isLoading()) {
+  <h3>Loading Books..</h3>
 }
 
 <p>
